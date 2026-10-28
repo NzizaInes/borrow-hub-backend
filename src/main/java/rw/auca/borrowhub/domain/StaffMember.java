@@ -45,7 +45,7 @@ public class StaffMember {
     public String getLastName() {
         return lastName;
     }
-    public void setLatName(String lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
     public String getStaffNumber() {

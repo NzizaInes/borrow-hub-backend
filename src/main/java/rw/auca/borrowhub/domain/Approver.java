@@ -51,11 +51,17 @@ public class Approver {
     public void setId(UUID id) {
         this.id = id;
     }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
     public String getFirstName() {
         return firstName;
     }
     public void setLastName(String lastName) { 
         this.lastName = lastName; 
+    }
+    public String getLastName() {
+        return lastName;
     }
     public String getEmail() { 
         return email; 
