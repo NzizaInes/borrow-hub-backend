@@ -63,4 +63,9 @@ public class DepartmentController {
         }
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/free", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Department>> getFreeDepartments() {
+        return new ResponseEntity<>(departmentService.getFreeDepartments(), HttpStatus.OK);
+    }
 }

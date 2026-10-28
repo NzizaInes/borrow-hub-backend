@@ -11,6 +11,7 @@ import rw.auca.borrowhub.domain.Approver;
 import rw.auca.borrowhub.domain.Department;
 import rw.auca.borrowhub.repository.ApproverRepository;
 import rw.auca.borrowhub.repository.DepartmentRepository;
+import rw.auca.borrowhub.repository.EquipmentTypeRepository;
 
 @Service 
 public class ApproverService {
@@ -19,6 +20,9 @@ public class ApproverService {
 
     @Autowired 
     private DepartmentRepository departmentRepo;
+
+    @Autowired 
+    private EquipmentTypeRepository equipmentTypeRepo;
 
     public String saveApprover(Approver approver) {
         if (approver.getDepartment() != null && approver.getDepartment().getId() != null) {
@@ -43,7 +47,7 @@ public class ApproverService {
 
     public String updateApprover(UUID id, Approver updated) {
         Optional<Approver> existing = approverRepo.findById(id);
-        if(existing.isEmpty()){
+        if (existing.isEmpty()) {
             return "The approver with that id does not exist";
         }
 
@@ -52,15 +56,24 @@ public class ApproverService {
         approver.setLastName(updated.getLastName());
         approver.setEmail(updated.getEmail());
 
-        if(updated.getDepartment() != null && updated.getDepartment().getId() != null) {
+        if (updated.getDepartment() != null && updated.getDepartment().getId() != null) {
             Optional<Department> dept = departmentRepo.findById(updated.getDepartment().getId());
-            if(dept.isEmpty()){
+            if (dept.isEmpty()) {
                 return "The department with that id does not exist";
             }
-
             approver.setDepartment(dept.get());
         } else {
             approver.setDepartment(null);
+        }
+
+        if (updated.getEquipmentTypes() != null) {
+            approver.getEquipmentTypes().clear();
+            for (var typeStub : updated.getEquipmentTypes()) {
+                if (typeStub.getId() != null) {
+                    var realType = equipmentTypeRepo.findById(typeStub.getId());
+                    realType.ifPresent(approver.getEquipmentTypes()::add);
+                }
+            }
         }
 
         approverRepo.save(approver);
@@ -74,5 +87,9 @@ public class ApproverService {
         }
         approverRepo.deleteById(id);
         return "Approver deleted successfully";
+    }
+
+    public List<Approver> getApproversByEquipmentType(String name) {
+        return approverRepo.findByEquipmentTypeName(name);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rw.auca.borrowhub.domain.StaffMember;
+import rw.auca.borrowhub.repository.ApproverRepository;
 import rw.auca.borrowhub.repository.StaffMemberRepository;
 
 @Service 
@@ -15,6 +16,9 @@ public class StaffMemberService {
     
     @Autowired 
     private StaffMemberRepository staffMemberRepo;
+
+    @Autowired 
+    private ApproverRepository approverRepo;
 
     public String saveStaffMember(StaffMember staffMember) {
         staffMemberRepo.save(staffMember);
@@ -54,5 +58,13 @@ public class StaffMemberService {
 
     public List<StaffMember> getStaffMembersByLastName(String lastName) {
         return staffMemberRepo.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
+    }
+
+    public List<StaffMember> getStaffMembersByApprover(UUID approverId) {
+        return staffMemberRepo.findStaffMembersByApproverId(approverId);
+    }
+
+    public boolean approverExists(UUID approverId) {
+        return approverRepo.existsById(approverId);
     }
 }

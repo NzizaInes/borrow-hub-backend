@@ -48,4 +48,8 @@ public class EquipmentTypeService {
         equipmentTypeRepo.deleteById(id);
         return "Equipment type deleted successfully";
     }
+
+    public List<EquipmentType> getUnusedEquipmentTypes() {
+        return equipmentTypeRepo.findUnusedEquipmentTypes();
+    }
 }

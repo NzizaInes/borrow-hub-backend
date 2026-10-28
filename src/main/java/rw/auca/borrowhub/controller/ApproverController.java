@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import rw.auca.borrowhub.domain.Approver;
@@ -66,5 +67,10 @@ public class ApproverController {
             return new ResponseEntity<>(msg, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(msg, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/by-equipment-type", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Approver>> getApproversByEquipmentType(@RequestParam String name) {
+        return new ResponseEntity<>(approverService.getApproversByEquipmentType(name), HttpStatus.OK);
     }
 }

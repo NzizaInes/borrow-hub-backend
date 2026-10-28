@@ -63,4 +63,9 @@ public class EquipmentTypeController {
         }
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/unused", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EquipmentType>> getUnusedEquipmentTypes() {
+        return new ResponseEntity<>(equipmentTypeService.getUnusedEquipmentTypes(), HttpStatus.OK);
+    }
 }

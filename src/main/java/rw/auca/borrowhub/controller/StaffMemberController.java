@@ -69,4 +69,12 @@ public class StaffMemberController {
     public ResponseEntity<List<StaffMember>> getStaffMembersByLastName(@RequestParam String lastName) {
         return new ResponseEntity<>(staffMemberService.getStaffMembersByLastName(lastName), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/of-approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getStaffMembersOfApprover(@PathVariable UUID approverId) {
+        if (!staffMemberService.approverExists(approverId)) {
+            return new ResponseEntity<>("The approver with that id does not exist", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(staffMemberService.getStaffMembersByApprover(approverId), HttpStatus.OK);
+    }
 }
