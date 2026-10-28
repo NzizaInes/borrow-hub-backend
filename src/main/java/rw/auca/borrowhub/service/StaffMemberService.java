@@ -51,4 +51,8 @@ public class StaffMemberService {
         staffMemberRepo.deleteById(id);
         return "Staff member deleted successfully";
     }
+
+    public List<StaffMember> getStaffMembersByLastName(String lastName) {
+        return staffMemberRepo.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
+    }
 }

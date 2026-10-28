@@ -1,9 +1,11 @@
 package rw.auca.borrowhub.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,9 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import rw.auca.borrowhub.domain.BorrowRequest;
+import rw.auca.borrowhub.domain.BorrowRequestStatus;
 import rw.auca.borrowhub.service.BorrowRequestService;
 
 @RestController 
@@ -67,4 +71,20 @@ public class BorrowRequestController {
         }
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/by-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BorrowRequest>> getBorrowRequestsByStatus(@RequestParam BorrowRequestStatus status) {
+        return new ResponseEntity<>(borrowRequestService.getBorrowRequestsByStatus(status), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/between", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BorrowRequest>> getBorrowRequestsBetween(
+        @RequestParam String start,
+        @RequestParam String end) {
+
+            LocalDate startDate = LocalDate.parse(start.trim());
+            LocalDate endDate = LocalDate.parse(end.trim());
+
+            return new ResponseEntity<>(borrowRequestService.getBorrowRequestsBetween(startDate, endDate), HttpStatus.OK);
+        }
 }

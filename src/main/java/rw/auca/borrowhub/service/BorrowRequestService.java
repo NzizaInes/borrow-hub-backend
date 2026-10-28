@@ -1,5 +1,6 @@
 package rw.auca.borrowhub.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -99,5 +100,13 @@ public class BorrowRequestService {
         }
         borrowRequestRepo.deleteById(id);
         return "Borrow request deleted successfully";
+    }
+
+    public List<BorrowRequest> getBorrowRequestsByStatus(BorrowRequestStatus status) {
+        return borrowRequestRepo.findByStatusOrderByBorrowDateAsc(status);
+    }
+
+    public List<BorrowRequest> getBorrowRequestsBetween(LocalDate start, LocalDate end) {
+        return borrowRequestRepo.findByBorrowDateBetweenOrderByBorrowDateAsc(start, end);
     }
 }
