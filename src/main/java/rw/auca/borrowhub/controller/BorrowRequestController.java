@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,6 +34,14 @@ public class BorrowRequestController {
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveBorrowRequest(@RequestBody BorrowRequest borrowRequest) {
         String msg = borrowRequestService.saveBorrowRequest(borrowRequest);
+
+        if (msg.equals("Borrow request date cannot be in the past")) {
+            return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+        }
+
+        if (msg.equals("Approver already has a borrow request on that date")) {
+            return new ResponseEntity<>(msg, HttpStatus.CONFLICT);
+        }
         if (msg.contains("does not exist") || msg.contains("is required")) {
             return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
         }
@@ -87,4 +95,17 @@ public class BorrowRequestController {
 
             return new ResponseEntity<>(borrowRequestService.getBorrowRequestsBetween(startDate, endDate), HttpStatus.OK);
         }
+
+    @PatchMapping(value = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> changeStatus(@PathVariable UUID id, @RequestParam BorrowRequestStatus status) {
+        String msg = borrowRequestService.changeStatus(id, status);
+
+        if (msg.equals("The borrow request with that id does not exist")) {
+            return new ResponseEntity<>(msg, HttpStatus.NOT_FOUND);
+        }
+        if (msg.startsWith("Cannot change status")) {
+            return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(msg, HttpStatus.OK);
+    }
 }

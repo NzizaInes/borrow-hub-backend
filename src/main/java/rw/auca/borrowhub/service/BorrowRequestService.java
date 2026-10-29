@@ -29,28 +29,35 @@ public class BorrowRequestService {
 
     public String saveBorrowRequest(BorrowRequest request) {
         if (request.getStaffMember() == null || request.getStaffMember().getId() == null) {
-            return "staff member id is required";
+            return "Staff member id is required";
         }
         if (request.getApprover() == null || request.getApprover().getId() == null) {
             return "Approver id is required";
         }
-
-        Optional<StaffMember> staff = staffMemberRepo.findById(request.getStaffMember().getId());
-        if (staff.isEmpty()) {
-            return "The staff member with that id does not exist";
+        if (request.getBorrowDate().isBefore(java.time.LocalDate.now())) {
+            return "Borrow request date cannot be in the past";
         }
 
+        Optional<StaffMember> staff = staffMemberRepo.findById(request.getStaffMember().getId());
+        if (staff.isEmpty()) return "The staff member with that id does not exist";
+
         Optional<Approver> approver = approverRepo.findById(request.getApprover().getId());
-        if (approver.isEmpty()) {
-            return "The approver with that id does not exist";
+        if (approver.isEmpty()) return "The approver with that id does not exist";
+
+        boolean alreadyBooked = borrowRequestRepo.existsByApproverIdAndBorrowDateAndStatusNot(
+            request.getApprover().getId(),
+            request.getBorrowDate(),
+            BorrowRequestStatus.REJECTED
+        );
+
+        if (alreadyBooked) {
+            return "Approver already has a borrow request on that date";
         }
 
         request.setStaffMember(staff.get());
         request.setApprover(approver.get());
 
-        if (request.getStatus() == null) {
-            request.setStatus(BorrowRequestStatus.PENDING);
-        }
+        request.setStatus(BorrowRequestStatus.PENDING);
 
         borrowRequestRepo.save(request);
         return "Borrow request saved successfully";
@@ -74,8 +81,6 @@ public class BorrowRequestService {
         request.setBorrowDate(updated.getBorrowDate());
         request.setEquipmentName(updated.getEquipmentName());
         request.setDaysRequested(updated.getDaysRequested());
-
-        request.setStatus(updated.getStatus());
 
         if (updated.getStaffMember() != null && updated.getStaffMember().getId() != null) {
             Optional<StaffMember> staff = staffMemberRepo.findById(updated.getStaffMember().getId());
@@ -108,5 +113,28 @@ public class BorrowRequestService {
 
     public List<BorrowRequest> getBorrowRequestsBetween(LocalDate start, LocalDate end) {
         return borrowRequestRepo.findByBorrowDateBetweenOrderByBorrowDateAsc(start, end);
+    }
+
+    public String changeStatus(UUID id, BorrowRequestStatus newStatus) {
+        Optional<BorrowRequest> existing = borrowRequestRepo.findById(id);
+        if (existing.isEmpty()) {
+            return "The borrow request with that id does not exist";
+        }
+        
+        BorrowRequest request = existing.get();
+        BorrowRequestStatus current = request.getStatus();
+
+        boolean allowed = false;
+        if (current == BorrowRequestStatus.PENDING && (newStatus == BorrowRequestStatus.APPROVED || newStatus == BorrowRequestStatus.REJECTED)) allowed = true;
+
+        else if (current == BorrowRequestStatus.APPROVED && (newStatus == BorrowRequestStatus.RETURNED || newStatus == BorrowRequestStatus.REJECTED)) allowed = true;
+
+        if (!allowed) {
+            return "Cannot change status from " + current + " to " + newStatus;
+        }
+
+        request.setStatus(newStatus);
+        borrowRequestRepo.save(request);
+        return "Borrow request status updated successfully";
     }
 }

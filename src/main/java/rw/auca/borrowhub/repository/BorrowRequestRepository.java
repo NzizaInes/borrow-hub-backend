@@ -13,4 +13,5 @@ public interface BorrowRequestRepository extends JpaRepository<BorrowRequest, UU
     boolean existsByStaffMemberIdAndApproverId(UUID staffMemberId, UUID approverId);
     List<BorrowRequest> findByStatusOrderByBorrowDateAsc(BorrowRequestStatus status);
     List<BorrowRequest> findByBorrowDateBetweenOrderByBorrowDateAsc(LocalDate start, LocalDate end);
+    boolean existsByApproverIdAndBorrowDateAndStatusNot(UUID approverId, LocalDate borrowDate, BorrowRequestStatus status);
 }
