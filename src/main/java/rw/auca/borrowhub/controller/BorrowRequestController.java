@@ -74,9 +74,15 @@ public class BorrowRequestController {
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteBorrowRequest(@PathVariable UUID id) {
         String msg = borrowRequestService.deleteBorrowRequest(id);
+
         if (msg.equals("The borrow request with that id does not exist")) {
             return new ResponseEntity<>(msg, HttpStatus.NOT_FOUND);
         }
+
+        if (msg.equals("That borrow request has return inspections, delete them first")) {
+            return new ResponseEntity<>(msg, HttpStatus.CONFLICT);
+        }
+
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
 

@@ -14,6 +14,7 @@ import rw.auca.borrowhub.domain.BorrowRequestStatus;
 import rw.auca.borrowhub.domain.StaffMember;
 import rw.auca.borrowhub.repository.ApproverRepository;
 import rw.auca.borrowhub.repository.BorrowRequestRepository;
+import rw.auca.borrowhub.repository.ReturnInspectionRepository;
 import rw.auca.borrowhub.repository.StaffMemberRepository;
 
 @Service 
@@ -26,6 +27,9 @@ public class BorrowRequestService {
 
     @Autowired 
     private ApproverRepository approverRepo;
+
+    @Autowired 
+    private ReturnInspectionRepository returnInspectionRepo;
 
     public String saveBorrowRequest(BorrowRequest request) {
         if (request.getStaffMember() == null || request.getStaffMember().getId() == null) {
@@ -101,8 +105,13 @@ public class BorrowRequestService {
     public String deleteBorrowRequest(UUID id) {
         Optional<BorrowRequest> existing = borrowRequestRepo.findById(id);
         if (existing.isEmpty()) {
-            return "The borrow request with that id does not exist";
+            return "That borrow request with that id does not exist";
         }
+
+        if (returnInspectionRepo.existsByBorrowRequest(existing.get())) {
+            return "That borrow request has return inspections, delete them first";
+        }
+
         borrowRequestRepo.deleteById(id);
         return "Borrow request deleted successfully";
     }
