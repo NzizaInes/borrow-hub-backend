@@ -7,6 +7,10 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -129,5 +133,21 @@ public class BorrowRequestController {
         LocalDate parsedDate = LocalDate.parse(date.trim());
         String msg = borrowRequestService.cancelApproverDay(approverId, parsedDate);
         return new ResponseEntity<>(msg, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/page", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<BorrowRequest>> getBorrowRequestsPage(
+        @RequestParam int page,
+        @RequestParam int size,
+        @RequestParam String sort
+    ) {
+        String[] sortParts = sort.split(",");
+        String sortField = sortParts[0];
+        Sort.Direction direction = sortParts.length > 1
+        ? Sort.Direction.fromString(sortParts[1])
+        : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+        return new ResponseEntity<>(borrowRequestService.getBorrowRequestsPage(pageable), HttpStatus.OK);
     }
 }

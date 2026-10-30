@@ -32,5 +32,7 @@ public interface BorrowRequestRepository extends JpaRepository<BorrowRequest, UU
         @Param("date") LocalDate date,
         @Param("newStatus") BorrowRequestStatus newStatus,
         @Param("excludeStatus") BorrowRequestStatus excludeStatus);
-    
+
+    long countByBorrowDate(LocalDate borrowDate);
+    long countByStatus(BorrowRequestStatus status);
 }

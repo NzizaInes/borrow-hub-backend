@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import rw.auca.borrowhub.domain.Approver;
@@ -159,5 +161,9 @@ public class BorrowRequestService {
             BorrowRequestStatus.RETURNED
         );
         return updated + "borrow requests cancelled";
+    }
+
+    public Page<BorrowRequest> getBorrowRequestsPage(Pageable pageable) {
+        return borrowRequestRepo.findAll(pageable);
     }
 }
