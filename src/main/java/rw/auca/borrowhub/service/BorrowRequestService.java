@@ -146,4 +146,18 @@ public class BorrowRequestService {
         borrowRequestRepo.save(request);
         return "Borrow request status updated successfully";
     }
+
+    public List<Object[]> getBorrowRequestStatsByStatus() {
+        return borrowRequestRepo.countBorrowRequestByStatus();
+    }
+
+    public String cancelApproverDay(UUID approverId, LocalDate date) {
+        int updated = borrowRequestRepo.cancelBorrowRequestsForApproverOnDate(
+            approverId, 
+            date,
+            BorrowRequestStatus.REJECTED,
+            BorrowRequestStatus.RETURNED
+        );
+        return updated + "borrow requests cancelled";
+    }
 }

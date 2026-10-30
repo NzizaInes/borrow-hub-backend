@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -112,6 +113,21 @@ public class BorrowRequestController {
         if (msg.startsWith("Cannot change status")) {
             return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(msg, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/stats/by-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Object[]>> getBorrowRequestStatsByStatus() {
+        return new ResponseEntity<>(borrowRequestService.getBorrowRequestStatsByStatus(), HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/cancel-day", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> cancelApproverDay(
+        @RequestParam UUID approverId,
+        @RequestParam String date
+    ) {
+        LocalDate parsedDate = LocalDate.parse(date.trim());
+        String msg = borrowRequestService.cancelApproverDay(approverId, parsedDate);
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
 }
