@@ -8,13 +8,13 @@
 ## Tech stack
 
 - Java 17
-- Spring Boot 3.4.x
+- Spring Boot 4.1.2
 - Spring Data JPA
 - PostgreSQL 17
 - Maven
 
 ## Steps to run the API
 
-1. **Create the database** (once):
+1. **Create the database**:
    ```sql
    CREATE DATABASE borrow_hub;
